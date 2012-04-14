@@ -16,9 +16,9 @@ import org.basex.io.random.*;
 import org.basex.util.*;
 
 /**
- * This class creates a database instance on disk.
- * The storage layout is described in the {@link Data} class.
- *
+ * This class creates a database instance on disk. The storage layout is
+ * described in the {@link Data} class.
+ * 
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
@@ -50,7 +50,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public DiskData build() throws IOException {
+  public MetaData init() throws IOException {
     final IO file = parser.src;
     final MetaData md = new MetaData(name, context);
     md.original = file != null ? file.path() : "";
@@ -60,8 +60,8 @@ public final class DiskBuilder extends Builder {
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();
-    int bs = (int) Math.min(md.filesize, Math.min(1 << 22,
-        rt.maxMemory() - rt.freeMemory() >> 2));
+    int bs = (int) Math.min(md.filesize,
+        Math.min(1 << 22, rt.maxMemory() - rt.freeMemory() >> 2));
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one
@@ -73,15 +73,21 @@ public final class DiskBuilder extends Builder {
     vout = new DataOutput(md.dbfile(DATAATV), bs);
     sout = new DataOutput(md.dbfile(DATATMP), bs);
 
-    final Names tags = new Names(md);
-    final Names atts = new Names(md);
-    parse(md, tags, atts);
+    tags = new Names(md);
+    atts = new Names(md);
+
+    return md;
+  }
+  
+  @Override
+  public Data finish(MetaData md) throws IOException {
     close();
 
     // copy temporary values into database table
     final TableAccess ta = new TableDiskAccess(md, true);
     final DataInput in = new DataInput(md.dbfile(DATATMP));
-    for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
+    for(; spos < ssize; ++spos)
+      ta.write4(in.readNum(), 8, in.readNum());
     ta.close();
     in.close();
     md.dbfile(DATATMP).delete();
@@ -101,6 +107,7 @@ public final class DiskBuilder extends Builder {
     }
     if(meta != null) DropDB.drop(meta.name, context);
   }
+  
 
   @Override
   public void close() throws IOException {

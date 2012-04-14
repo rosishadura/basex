@@ -41,9 +41,9 @@ public abstract class Builder extends Progress {
   /** Meta data on built database. */
   MetaData meta;
   /** Tag name index. */
-  private Names tags;
+  protected Names tags;
   /** Attribute name index. */
-  private Names atts;
+  protected Names atts;
 
   /** Parent stack. */
   private final IntList pstack = new IntList();
@@ -224,7 +224,15 @@ public abstract class Builder extends Progress {
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public abstract Data build() throws IOException;
+  public Data build() throws IOException {
+    MetaData md = init();
+    parse(md, tags, atts);
+    return finish(md);
+  }
+  
+  public abstract MetaData init() throws IOException;
+  
+  public abstract Data finish(MetaData md) throws IOException;
 
   /**
    * Closes open references.

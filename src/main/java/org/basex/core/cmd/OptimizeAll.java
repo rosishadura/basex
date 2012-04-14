@@ -98,7 +98,7 @@ public final class OptimizeAll extends ACreate {
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
     try {
-      final DiskData d = builder.build();
+      final DiskData d = (DiskData)builder.build();
       if(m.createtext) create(IndexType.TEXT, d, cmd);
       if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
       if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);

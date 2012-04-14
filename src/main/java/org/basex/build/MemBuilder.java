@@ -44,11 +44,11 @@ public final class MemBuilder extends Builder {
    * @throws IOException I/O exception
    */
   public static MemData build(final String name, final Parser parser) throws IOException {
-    return new MemBuilder(name, parser).build();
+    return (MemData) new MemBuilder(name, parser).build();
   }
-
+  
   @Override
-  public MemData build() throws IOException {
+  public MetaData init() {
     data = new MemData(null, null, path, ns, parser.prop);
 
     final MetaData md = data.meta;
@@ -62,8 +62,15 @@ public final class MemBuilder extends Builder {
     md.original = file != null ? file.path() : "";
     md.filesize = file != null ? file.length() : 0;
     md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
-
-    parse(md, data.tagindex, data.atnindex);
+    
+    tags = data.tagindex;
+    atts = data.atnindex;
+    
+    return md;
+  }
+  
+  @Override
+  public Data finish(MetaData md) {
     path.finish(data);
     return data;
   }
