@@ -70,13 +70,14 @@ public final class CreateDB extends ACreate {
           io = cache();
           if(io == null) {
             InputStream is = in.getByteStream();
-            if(!(is instanceof BufferedInputStream ||
-                is instanceof BufferInput)) is = new BufferedInputStream(is);
+            if(!(is instanceof BufferedInputStream || is instanceof BufferInput)) is =
+                new BufferedInputStream(
+                is);
 
             final LookupInput li = new LookupInput(is);
             if(li.lookup() != -1) {
-              parser = new SAXWrapper(new SAXSource(new InputSource(li)),
-                  name + '.' + format, context.prop);
+              parser = new SAXWrapper(new SAXSource(new InputSource(li)), name
+                  + '.' + format, context.prop);
             }
           }
         } catch(final IOException ex) {
@@ -101,22 +102,23 @@ public final class CreateDB extends ACreate {
     try {
       if(prop.is(Prop.MAINMEM)) {
         // create main memory instance
-        final Data data = progress(new MemBuilder(name, parser)).build();
+        final Data data = progress(
+            new MemBuilder(name, parser.src, parser.prop)).build(parser);
         context.openDB(data);
         context.pin(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
-        progress(new DiskBuilder(name, parser, context)).build().close();
+        progress(new DiskBuilder(name, parser.src, context)).build(parser).close();
         // second step: open database and create index structures
         final Open open = new Open(name);
         if(!open.run(context)) return error(open.info());
         final Data data = context.data();
         try {
-          if(data.meta.createtext) create(IndexType.TEXT,      data, this);
+          if(data.meta.createtext) create(IndexType.TEXT, data, this);
           if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
-          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
+          if(data.meta.createftxt) create(IndexType.FULLTEXT, data, this);
         } finally {
           data.finishUpdate();
         }
@@ -129,8 +131,8 @@ public final class CreateDB extends ACreate {
       Util.debug(ex);
       abort();
       final String msg = ex.getMessage();
-      return error(msg != null && !msg.isEmpty() ? msg :
-        Util.info(NOT_PARSED_X, parser.src));
+      return error(msg != null && !msg.isEmpty() ? msg : Util.info(
+          NOT_PARSED_X, parser.src));
     } catch(final Exception ex) {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
@@ -148,11 +150,12 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final String name, final Parser parser,
-      final Context ctx) throws IOException {
+  public static synchronized Data create(final String name,
+      final Parser parser, final Context ctx) throws IOException {
 
     // check permissions
-    if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_NEEDED_X, Perm.CREATE);
+    if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_NEEDED_X,
+        Perm.CREATE);
 
     // create main memory database instance
     final Prop prop = ctx.prop;
@@ -162,20 +165,24 @@ public final class CreateDB extends ACreate {
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
 
     // create disk builder, set database path
-    final Builder builder = new DiskBuilder(name, parser, ctx);
+    final Builder builder = new DiskBuilder(name, parser.src, ctx);
 
     // build database and index structures
     try {
-      final Data data = builder.build();
-      if(data.meta.createtext) data.setIndex(IndexType.TEXT,
-        new ValueBuilder(data, true).build());
+      final Data data = builder.build(parser);
+      if(data.meta.createtext) data.setIndex(IndexType.TEXT, new ValueBuilder(
+          data, true).build());
       if(data.meta.createattr) data.setIndex(IndexType.ATTRIBUTE,
-        new ValueBuilder(data, false).build());
+          new ValueBuilder(data, false).build());
       if(data.meta.createftxt) data.setIndex(IndexType.FULLTEXT,
-        FTBuilder.get(data).build());
+          FTBuilder.get(data).build());
       data.close();
     } finally {
-      try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }
+      try {
+        builder.close();
+      } catch(final IOException exx) {
+        Util.debug(exx);
+      }
     }
     ctx.databases().add(name);
     return Open.open(name, ctx);
@@ -188,10 +195,10 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized MemData mainMem(final Parser parser, final Context ctx)
-      throws IOException {
+  public static synchronized MemData mainMem(final Parser parser,
+      final Context ctx) throws IOException {
 
-    if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
+    if(ctx.user.has(Perm.CREATE)) return MemBuilder.build1(parser);
     throw new BaseXException(PERM_NEEDED_X, Perm.CREATE);
   }
 
@@ -205,8 +212,8 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
 
-    if(!source.exists()) throw new FileNotFoundException(
-        Util.info(RESOURCE_NOT_FOUND_X, source));
+    if(!source.exists()) throw new FileNotFoundException(Util.info(
+        RESOURCE_NOT_FOUND_X, source));
     return mainMem(new DirParser(source, ctx.prop, null), ctx);
   }
 

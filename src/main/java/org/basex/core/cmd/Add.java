@@ -15,9 +15,9 @@ import org.basex.util.*;
 
 /**
  * Evaluates the 'add' command and adds a document to a collection.<br/>
- * Note that the constructors of this class have changed with Version 7.0:
- * the target path and file name have been merged and are now specified
- * as first argument.
+ * Note that the constructors of this class have changed with Version 7.0: the
+ * target path and file name have been merged and are now specified as first
+ * argument.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -29,10 +29,9 @@ public final class Add extends ACreate {
   boolean lock = true;
 
   /**
-   * Constructor, specifying a target path.
-   * Note that the constructors of this class have changed with Version 7.0:
-   * the target path and file name have been merged and are now specified
-   * as first argument.
+   * Constructor, specifying a target path. Note that the constructors of this
+   * class have changed with Version 7.0: the target path and file name have
+   * been merged and are now specified as first argument.
    * @param path target path, optionally terminated by a new file name
    */
   public Add(final String path) {
@@ -40,12 +39,11 @@ public final class Add extends ACreate {
   }
 
   /**
-   * Constructor, specifying a target path and an input.
-   * Note that the constructors of this class have changed with Version 7.0:
-   * the target path and file name have been merged and are now specified
-   * as first argument.
-   * @param path target path, optionally terminated by a new file name.
-   * If {@code null}, the name of the input will be set as path.
+   * Constructor, specifying a target path and an input. Note that the
+   * constructors of this class have changed with Version 7.0: the target path
+   * and file name have been merged and are now specified as first argument.
+   * @param path target path, optionally terminated by a new file name. If
+   *          {@code null}, the name of the input will be set as path.
    * @param input input file or XML string
    */
   public Add(final String path, final String input) {
@@ -114,18 +112,21 @@ public final class Add extends ACreate {
 
     // create random database name for disk-based creation
     final String db = large ? context.mprop.random(data.meta.name) : name;
-    build = large ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
+    build = large ? new DiskBuilder(db, parser.src, context) : new MemBuilder(db,
+        parser.src, parser.prop);
 
     Data tmp = null;
     try {
-      tmp = build.build();
+      tmp = build.build(parser);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
 
     } finally {
       // close and drop intermediary database instance
-      try { build.close(); } catch(final IOException e) { }
+      try {
+        build.close();
+      } catch(final IOException e) { }
       if(tmp != null) tmp.close();
       // drop temporary database instance
       if(large) DropDB.drop(db, context);

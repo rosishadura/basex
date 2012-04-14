@@ -44,6 +44,38 @@ public enum GUICommands implements GUICommand {
     }
   },
 
+  /**
+   * Input configuration.
+   */
+  C_INCONFIG("Input" + DOTS, "% RSI", "", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      // open file chooser for XML creation
+      final DialogNew dialog = new DialogNew(gui);
+      if(!dialog.ok()) return;
+      final String in = gui.gprop.get(GUIProp.CREATEPATH);
+      final String db = gui.gprop.get(GUIProp.CREATENAME);
+      DialogProgress.execute(dialog, CREATING_DB,
+          new CreateDB(db, in.isEmpty() ? null : in));
+    }
+  },
+
+  /**
+   * Output configuration.
+   */
+  C_OUTCONFIG("Output" + DOTS, "% RSO", "", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      // open file chooser for XML creation
+      final DialogNew dialog = new DialogNew(gui);
+      if(!dialog.ok()) return;
+      final String in = gui.gprop.get(GUIProp.CREATEPATH);
+      final String db = gui.gprop.get(GUIProp.CREATENAME);
+      DialogProgress.execute(dialog, CREATING_DB,
+          new CreateDB(db, in.isEmpty() ? null : in));
+    }
+  },
+
   /** Opens a dialog to manage databases. */
   C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% O", H_OPEN_MANAGE, false, false) {
     @Override

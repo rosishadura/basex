@@ -10,6 +10,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.*;
+import org.basex.io.input.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -96,9 +97,10 @@ public final class OptimizeAll extends ACreate {
     ctx.databases().add(tname);
 
     // build database and index structures
-    final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
+    DBParser parser = new DBParser(old, cmd);
+    final DiskBuilder builder = new DiskBuilder(tname, parser.src, ctx);
     try {
-      final DiskData d = (DiskData)builder.build();
+      final DiskData d = (DiskData) builder.build(parser);
       if(m.createtext) create(IndexType.TEXT, d, cmd);
       if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
       if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
@@ -151,7 +153,7 @@ public final class OptimizeAll extends ACreate {
     }
 
     @Override
-    public void parse(final Builder build) throws IOException {
+    public void parse(final ParserListener build) throws IOException {
       final Serializer ser = new BuilderSerializer(build) {
         @Override
         protected void startOpen(final byte[] t) throws IOException {

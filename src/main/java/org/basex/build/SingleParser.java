@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.basex.core.*;
 import org.basex.io.IO;
+import org.basex.io.input.*;
 
 /**
  * This class defines an abstract parser for single resources.
@@ -14,7 +15,7 @@ import org.basex.io.IO;
  */
 public abstract class SingleParser extends Parser {
   /** Builder reference. */
-  protected Builder builder;
+  protected ParserListener builder;
 
   /**
    * Constructor.
@@ -26,7 +27,7 @@ public abstract class SingleParser extends Parser {
   }
 
   @Override
-  public final void parse(final Builder build) throws IOException {
+  public final void parse(final ParserListener build) throws IOException {
     builder = build;
     builder.startDoc(token(target + src.name()));
     parse();
@@ -44,7 +45,7 @@ public abstract class SingleParser extends Parser {
    * @param b builder instance
    * @return self reference
    */
-  public SingleParser builder(final Builder b) {
+  public SingleParser builder(final ParserListener b) {
     builder = b;
     return this;
   }

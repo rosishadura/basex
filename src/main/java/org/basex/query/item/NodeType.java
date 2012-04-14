@@ -68,7 +68,7 @@ public enum NodeType implements Type {
       if(o instanceof Document) {
         try {
           final DOMWrapper p = new DOMWrapper((Document) o, "", new Prop());
-          return new DBNode(MemBuilder.build(p));
+          return new DBNode(MemBuilder.build1(p));
         } catch(final IOException ex) {
           UNDOC.thrw(ii, ex);
         }

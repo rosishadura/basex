@@ -133,9 +133,9 @@ public final class DBAdd extends InsertBase {
       mdata.update(0, Data.DOC, pth);
     } else if(dt.isString()) {
       final Parser p = new DirParser(io, ctx.prop, data.meta.path).target(target);
-      final MemBuilder b = new MemBuilder(data.meta.name, p);
+      final MemBuilder b = new MemBuilder(data.meta.name, p.src, ctx.prop);
       try {
-        mdata = (MemData)b.build();
+        mdata = (MemData) b.build(p);
       } catch(final IOException ex) {
         throw IOERR.thrw(info, ex);
       }

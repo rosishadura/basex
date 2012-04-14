@@ -1,11 +1,12 @@
 package org.basex.io.serial;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.build.Builder;
-import org.basex.query.item.Item;
-import org.basex.util.Atts;
-import org.basex.util.Util;
+
+import java.io.*;
+
+import org.basex.io.input.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * A serializer that pipes the events directly through to a builder.
@@ -17,13 +18,13 @@ public class BuilderSerializer extends Serializer {
   /** Attribute cache. */
   private final Atts att = new Atts();
   /** The builder. */
-  private final Builder build;
+  private final ParserListener build;
 
   /**
    * Constructor taking a Builder.
    * @param b builder to be used
    */
-  public BuilderSerializer(final Builder b) {
+  public BuilderSerializer(final ParserListener b) {
     build = b;
   }
 

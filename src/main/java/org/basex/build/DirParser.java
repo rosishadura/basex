@@ -13,6 +13,7 @@ import org.basex.data.*;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
+import org.basex.io.input.*;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
@@ -77,7 +78,7 @@ public final class DirParser extends Parser {
   }
 
   @Override
-  public void parse(final Builder build) throws IOException {
+  public void parse(final ParserListener build) throws IOException {
     build.meta.filesize = 0;
     build.meta.original = src.path();
     parse(build, src);
@@ -89,7 +90,7 @@ public final class DirParser extends Parser {
    * @param io current input
    * @throws IOException I/O exception
    */
-  private void parse(final Builder b, final IO io) throws IOException {
+  private void parse(final ParserListener b, final IO io) throws IOException {
     if(io.isDir()) {
       // only {@link IOFile} instances can have children
       for(final IO f : ((IOFile) io).children()) parse(b, f);
@@ -98,7 +99,8 @@ public final class DirParser extends Parser {
 
       // loop through all (potentially zipped) files
       while(io.more(archives)) {
-        b.checkStop();
+        //[RS]: Check stop
+        //b.checkStop();
 
         // add file size for database meta information
         final long l = io.length();

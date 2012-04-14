@@ -97,7 +97,8 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.NODES, Text.OPTIONS, Text.HELP
+    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.NODES, Text.OPTIONS, Text.HELP,
+    "Configuration"
   };
 
   /**
@@ -127,7 +128,8 @@ public final class GUIConstants {
     C_HELP, Prop.MAC ? null : EMPTY,
     C_COMMUNITY, C_UPDATES, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : C_ABOUT
-  }};
+  },
+  {C_INCONFIG, C_OUTCONFIG}};
 
   /** Context menu entries. */
   public static final GUICommands[] POPUP = {

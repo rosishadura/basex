@@ -13,6 +13,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.input.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
 
@@ -29,7 +30,7 @@ public abstract class Parser extends Progress {
       To speed up processing, the same instance is used over and over. */
   protected final Atts atts = new Atts();
   /** Database properties. */
-  protected final Prop prop;
+  public final Prop prop;
   /** Target path (empty, or suffixed with a single slash). */
   protected String target = "";
 
@@ -57,7 +58,7 @@ public abstract class Parser extends Progress {
    * @param build database builder
    * @throws IOException I/O exception
    */
-  public abstract void parse(final Builder build) throws IOException;
+  public abstract void parse(final ParserListener build) throws IOException;
 
   /**
    * Closes the parser.
@@ -94,7 +95,7 @@ public abstract class Parser extends Progress {
   public static Parser emptyParser(final Prop pr) {
     return new Parser((IO) null, pr) {
       @Override
-      public void parse(final Builder build) { /* empty */ }
+      public void parse(final ParserListener build) { /* empty */ }
     };
   }
 

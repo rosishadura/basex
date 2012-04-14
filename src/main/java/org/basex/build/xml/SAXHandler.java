@@ -1,13 +1,14 @@
 package org.basex.build.xml;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.build.Builder;
+
+import java.io.*;
+
+import org.basex.io.input.*;
 import org.basex.util.*;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.*;
+import org.xml.sax.ext.*;
+import org.xml.sax.helpers.*;
 
 /**
  * SAX Parser wrapper.
@@ -19,7 +20,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Temporary attribute array. */
   private final Atts atts = new Atts();
   /** Builder reference. */
-  private final Builder builder;
+  private final ParserListener builder;
   /** DTD flag. */
   private boolean dtd;
   /** Whitespace chopping. */
@@ -39,7 +40,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param build builder reference
    * @param ch chopping flag
    */
-  SAXHandler(final Builder build, final boolean ch) {
+  SAXHandler(final ParserListener build, final boolean ch) {
     builder = build;
     chop = ch;
   }

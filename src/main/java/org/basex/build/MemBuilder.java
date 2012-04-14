@@ -1,14 +1,16 @@
 package org.basex.build;
 
-import java.io.IOException;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.path.*;
+import org.basex.io.*;
+import org.basex.io.input.*;
 
 /**
- * This class creates a database instance in main memory.
- * The storage layout is described in the {@link Data} class.
+ * This class creates a database instance in main memory. The storage layout is
+ * described in the {@link Data} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -16,14 +18,18 @@ import org.basex.io.IO;
 public final class MemBuilder extends Builder {
   /** Data reference. */
   private MemData data;
+  /** Properties of the new database. */
+  private Prop prop;
 
   /**
    * Constructor.
    * @param nm name of database
-   * @param parse parser
+   * @param s source
+   * @param p properties of the new database
    */
-  public MemBuilder(final String nm, final Parser parse) {
-    super(nm, parse);
+  public MemBuilder(final String nm, final IO s, final Prop p) {
+    super(nm, s);
+    prop = p;
   }
 
   /**
@@ -32,7 +38,7 @@ public final class MemBuilder extends Builder {
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final Parser parser) throws IOException {
+  public static MemData build1(final Parser parser) throws IOException {
     return build(parser.src.name(), parser);
   }
 
@@ -43,13 +49,14 @@ public final class MemBuilder extends Builder {
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final String name, final Parser parser) throws IOException {
-    return (MemData) new MemBuilder(name, parser).build();
+  public static MemData build(final String name, final Parser parser)
+      throws IOException {
+    return (MemData) new MemBuilder(name, parser.src, parser.prop).build(parser);
   }
-  
+
   @Override
-  public MetaData init() {
-    data = new MemData(null, null, path, ns, parser.prop);
+  public void init() {
+    data = new MemData(null, null, new PathSummary(null), new Namespaces(), prop);
 
     final MetaData md = data.meta;
     md.name = name;
@@ -58,56 +65,22 @@ public final class MemBuilder extends Builder {
     md.createattr = true;
     md.textindex = true;
     md.attrindex = true;
-    final IO file = parser.src;
-    md.original = file != null ? file.path() : "";
-    md.filesize = file != null ? file.length() : 0;
-    md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
-    
-    tags = data.tagindex;
-    atts = data.atnindex;
-    
-    return md;
+    if(source == null) {
+      md.original = "";
+      md.filesize = 0;
+      md.time = System.currentTimeMillis();
+    } else {
+      md.original = source.path();
+      md.filesize = source.length();
+      md.time = source.timeStamp();
+    }
+    listener = new MemParserListener(data);
   }
-  
+
   @Override
-  public Data finish(MetaData md) {
-    path.finish(data);
+  public Data finish() {
+    listener.path.finish(data);
     return data;
   }
 
-  @Override
-  public void close() throws IOException {
-    parser.close();
-  }
-
-  @Override
-  protected void addDoc(final byte[] value) {
-    data.doc(meta.size, 0, value);
-    data.insert(meta.size);
-  }
-
-  @Override
-  protected void addElem(final int dist, final int nm, final int asize,
-      final int uri, final boolean ne) {
-    data.elem(dist, nm, asize, asize, uri, ne);
-    data.insert(meta.size);
-  }
-
-  @Override
-  protected void addAttr(final int nm, final byte[] value, final int dist,
-      final int uri) {
-    data.attr(meta.size, dist, nm, value, uri, false);
-    data.insert(meta.size);
-  }
-
-  @Override
-  protected void addText(final byte[] value, final int dist, final byte kind) {
-    data.text(meta.size, dist, value, kind);
-    data.insert(meta.size);
-  }
-
-  @Override
-  protected void setSize(final int pre, final int size) {
-    data.size(pre, Data.ELEM, size);
-  }
 }
